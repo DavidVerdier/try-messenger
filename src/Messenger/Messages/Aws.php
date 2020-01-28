@@ -6,7 +6,7 @@ namespace App\Messenger\Messages;
 
 use App\Entity\Client;
 
-class Pdf
+class Aws
 {
     private $client;
 

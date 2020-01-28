@@ -3,13 +3,9 @@
 
 namespace App\Messenger\Handlers;
 
-use App\Messenger\Messages\Message;
 use App\Messenger\Messages\Pdf;
 use App\Service\PdfCreator;
-use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
-use Symfony\Component\Mime\Email;
-use Twig\Environment;
 
 class PdfHandler implements MessageHandlerInterface
 {
@@ -36,6 +32,7 @@ class PdfHandler implements MessageHandlerInterface
      */
     public function __invoke(Pdf $pdf)
     {
+        sleep(5);
         $this->pdfCreator->create($pdf);
     }
 }

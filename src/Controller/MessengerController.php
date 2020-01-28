@@ -2,42 +2,25 @@
 
 namespace App\Controller;
 
-use App\Messenger\Messages\Message;
-use App\Messenger\Messages\Pdf;
-use App\Service\PdfCreator;
+use App\Messenger\Messages\Scenario;
+use App\Repository\ClientRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class MessengerController extends AbstractController
 {
     /**
-     * @Route(name="messenger")
+     * @Route("client/{id}", name="client", methods={"GET", "POST"})
      */
-    public function index()
+    public function client(int $id, ClientRepository $clientRepository)
     {
-        $now = new \DateTime();
+        $client = $clientRepository->find($id);
 
-        //$this->dispatchMessage(new Message($now->format('H:i:s')));
+        if (null === $client) {
+            throw $this->createNotFoundException('Not found');
+        }
 
-        return $this->render('messenger/index.html.twig', [
-            'controller_name' => 'MessengerController',
-        ]);
-    }
-
-    /**
-     * @Route("/pdf/{id}", name="pdf")
-     *
-     * @param PdfCreator $pdfCreator
-     * @return Response
-     * @throws \Spipu\Html2Pdf\Exception\Html2PdfException
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
-     */
-    public function pdf(PdfCreator $pdfCreator, int $id): Response
-    {
-        $this->dispatchMessage(new Pdf($id));
+        $this->dispatchMessage(new Scenario($client));
 
         return $this->render('messenger/index.html.twig', [
             'controller_name' => 'MessengerController',

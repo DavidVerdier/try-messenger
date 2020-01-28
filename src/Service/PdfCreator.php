@@ -3,26 +3,45 @@
 namespace App\Service;
 
 use App\Messenger\Messages\Pdf;
+use App\Repository\ClientRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Spipu\Html2Pdf\Html2Pdf;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
 class PdfCreator
 {
-    private $html2pdf;
-
+    /**
+     * @var Environment
+     */
     private $twig;
 
-    private $fileSystem;
-
+    /**
+     * @var array
+     */
     private $pdfDirectories;
 
-    public function __construct(Environment $twig, array $pdfDirectories)
+    /**
+     * @var EntityManagerInterface
+     */
+    private $em;
+
+    /**
+     * @var ClientRepository
+     */
+    private $repository;
+
+    /**
+     * PdfCreator constructor.
+     * @param Environment $twig
+     * @param EntityManagerInterface $em
+     * @param ClientRepository $clientRepository
+     * @param array $pdfDirectories
+     */
+    public function __construct(Environment $twig, EntityManagerInterface $em, ClientRepository $clientRepository, array $pdfDirectories)
     {
-        $this->html2pdf = new Html2Pdf();
+        $this->repository = $clientRepository;
         $this->twig = $twig;
-        $this->fileSystem = new Filesystem();
+        $this->em = $em;
         $this->pdfDirectories = $pdfDirectories;
     }
 
@@ -34,22 +53,23 @@ class PdfCreator
      */
     public function create(Pdf $pdf)
     {
-        $content = $this->twig->render('pdf/pdf.html.twig');
+        sleep(15);
 
-        $this->html2pdf->writeHTML($content);
+        $client = $this->repository->find($pdf->getClient()->getId());
 
-        $filename = $this->pdfDirectories['tmp'] . $pdf->getClientId() .'_'. uniqid() . '.pdf';
+        $html2pdf = new Html2Pdf();
 
-        $this->html2pdf->output($filename, 'F');
-/*
-        $output = file_get_contents($filename);
+        $content = $this->twig->render('pdf/pdf.html.twig', ['client' => $pdf->getClient()]);
 
-        $response = new Response($output, 200, [
-            'Content-Type'        => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="my_file.pdf"',
-        ]);
+        $html2pdf->writeHTML($content);
 
-        return $response;
-*/
+        $filename = $client->getId() .'_'. uniqid() . '.pdf';
+
+        $client->setPdf($filename);
+
+        $html2pdf->output($this->pdfDirectories['tmp'] .  $filename, 'F');
+
+        $this->em->persist($client);
+        $this->em->flush();
     }
 }
