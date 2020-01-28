@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Messenger\Messages\Message;
+use App\Messenger\Messages\Pdf;
 use App\Service\PdfCreator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +26,7 @@ class MessengerController extends AbstractController
     }
 
     /**
-     * @Route("/pdf", name="pdf")
+     * @Route("/pdf/{id}", name="pdf")
      *
      * @param PdfCreator $pdfCreator
      * @return Response
@@ -34,8 +35,12 @@ class MessengerController extends AbstractController
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function pdf(PdfCreator $pdfCreator): Response
+    public function pdf(PdfCreator $pdfCreator, int $id): Response
     {
-        return $pdfCreator->create();
+        $this->dispatchMessage(new Pdf($id));
+
+        return $this->render('messenger/index.html.twig', [
+            'controller_name' => 'MessengerController',
+        ]);
     }
 }
