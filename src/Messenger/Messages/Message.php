@@ -1,10 +1,10 @@
 <?php
 
 
-namespace App\Message;
+namespace App\Messenger\Messages;
 
 
-class TryMessage
+class Message
 {
     private $content;
 

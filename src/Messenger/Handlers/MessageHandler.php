@@ -1,48 +1,51 @@
 <?php
 
 
-namespace App\MessageHandler;
+namespace App\Messenger\Handlers;
 
-use App\Message\TryMessage;
+use App\Messenger\Messages\Message;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Mime\Email;
+use Twig\Environment;
 
-class TryMessageHandler implements MessageHandlerInterface
+class MessageHandler implements MessageHandlerInterface
 {
     /**
      * @var MailerInterface
      */
     private $mailer;
 
+    private $twig;
+
     /**
      * TryMessageHandler constructor.
      * @param MailerInterface $mailer
      */
-    public function __construct(MailerInterface $mailer)
+    public function __construct(MailerInterface $mailer, Environment $twig)
     {
         $this->mailer = $mailer;
+        $this->twig = $twig;
     }
 
     /**
-     * @param TryMessage $message
+     * @param Message $message
      * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
      */
-    public function __invoke(TryMessage $message)
+    public function __invoke(Message $message)
     {
-
         $now1 = new \DateTime();
-
-
-        sleep(60);
-
+        sleep(10);
         $now = new \DateTime();
-        $html = sprintf('<p>Message created at %s</p><p>Handler called at : %s</p><p>Message sent at : %s</p>',
-            $message->getContent(),
-            $now1->format('H:i:s'),
-            $now->format('H:i:s')
-        );
 
+        $html = $this->twig->render('email/message.html.twig', array(
+            'message' => $message,
+            'calledAt' => $now1->format('H:i:s'),
+            'sentAt' => $now->format('H:i:s')
+        ));
 
         $email = (new Email())
             ->from('hello@mobiledev-pro.fr')
@@ -51,6 +54,5 @@ class TryMessageHandler implements MessageHandlerInterface
             ->html($html);
 
         $this->mailer->send($email);
-
     }
 }

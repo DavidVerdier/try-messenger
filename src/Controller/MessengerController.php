@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Message\TryMessage;
+use App\Messenger\Messages\Message;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -15,7 +15,7 @@ class MessengerController extends AbstractController
     {
         $now = new \DateTime();
 
-        $this->dispatchMessage(new TryMessage($now->format('H:i:s')));
+        $this->dispatchMessage(new Message($now->format('H:i:s')));
 
         return $this->render('messenger/index.html.twig', [
             'controller_name' => 'MessengerController',
