@@ -32,12 +32,12 @@ class Client
     private $pdf;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true)
+     * @ORM\Column(type="boolean", options={"default":false})
      */
     private $uploaded;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true)
+     * @ORM\Column(type="boolean", options={"default":false})
      */
     private $sent;
 

@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Client index{% endblock %}
+
+{% block body %}
+    <h1>Client index</h1>
+
+    {% if wait %}
+    <p class="alert alert-warning">Actuellement {{ wait }} client en cours de création. Merci de patienter quelques minutes.</p>
+    {% endif %}
+
+    <p style="margin-bottom: 75px;">
+        <a href="{{ path('client_new') }}" class="float-right btn btn-success">Create new</a>
+    </p>
+
+    <div class="clearfix"></div>
+
+    <table class="table table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>Id</th>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Pdf</th>
+                <th>Uploaded</th>
+                <th>Sent</th>
+                <th>status</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for client in clients %}
+            <tr>
+                <td>{{ client.id }}</td>
+                <td>{{ client.email }}</td>
+                <td>{{ client.name }}</td>
+                <td>{{ client.pdf }}</td>
+                <td>{{ client.uploaded ? 'Yes' : 'No' }}</td>
+                <td>{{ client.sent ? 'Yes' : 'No' }}</td>
+                <td class="{{ client.uploaded ? 'ok' : 'fetch' }}" data-target="{{ path('client_status', {'id': client.id}) }}">
+                    {% if client.uploaded != true %}
+                    <span class="badge badge-secondary">{{ client|get_status}}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ path('client_show', {'id': client.id}) }}" class="btn btn-sm btn-primary">show</a>
+                    <a href="{{ path('client_edit', {'id': client.id}) }}" class="btn btn-sm btn-warning">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $( document ).ready(function() {
+                setInterval(updateStatus, 1000);
+        });
+
+        function updateStatus() {
+            $('.fetch').each(function() {
+                let that = $(this);
+                $.get(that.data('target'),function(data) {
+                  that.html('<span class="badge badge-' + data.class + '">' + data.status + '</span>');
+                });
+            });
+        }
+
+
+    </script>
+{% endblock %}

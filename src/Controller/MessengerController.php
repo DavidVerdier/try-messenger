@@ -2,24 +2,18 @@
 
 namespace App\Controller;
 
+use App\Entity\Client;
 use App\Messenger\Messages\Scenario;
-use App\Repository\ClientRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
 class MessengerController extends AbstractController
 {
     /**
-     * @Route("client/{id}", name="client", methods={"GET", "POST"})
+     * @Route("message/{id}", name="client", methods={"GET", "POST"})
      */
-    public function client(int $id, ClientRepository $clientRepository)
+    public function client(Client $client)
     {
-        $client = $clientRepository->find($id);
-
-        if (null === $client) {
-            throw $this->createNotFoundException('Not found');
-        }
-
         $this->dispatchMessage(new Scenario($client));
 
         return $this->render('messenger/index.html.twig', [
