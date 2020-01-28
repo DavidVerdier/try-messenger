@@ -47,10 +47,6 @@ class TryMessageHandler implements MessageHandlerInterface
         $email = (new Email())
             ->from('hello@mobiledev-pro.fr')
             ->to('david.verdier@mobiledev-pro.fr')
-            //->cc('cc@example.com')
-            //->bcc('bcc@example.com')
-            //->replyTo('fabien@example.com')
-            //->priority(Email::PRIORITY_HIGH)
             ->subject('Time for Symfony Mailer!')
             ->html($html);
 
